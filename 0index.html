@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Sensi FF — IA Mihh</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3c 50%, #2c1654 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Tela de Entrada */
+        .tela-entrada {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3c 50%, #2c1654 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: all 0.5s ease;
+        }
+        .tela-entrada.fechar {
+            opacity: 0;
+            transform: scale(1.1);
+            pointer-events: none;
+        }
+        .logo-icone {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: flutuar 2s ease-in-out infinite;
+        }
+        @keyframes flutuar {
+            0%,100%{transform: translateY(0);}
+            50%{transform: translateY(-15px);}
+        }
+        .caixa-entrada {
+            background: rgba(255,255,255,.05);
+            border: 2px solid rgba(233,69,96,.5);
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 0 40px rgba(233,69,96,.2);
+            max-width: 380px;
+            width: 90%;
+        }
+        .caixa-entrada h1 {
+            color: #fff;
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+        .caixa-entrada h1 span { color: #ffd700; }
+        .caixa-entrada p {
+            color: #ccc;
+            margin-bottom: 30px;
+            font-size: 1rem;
+        }
+        .btn-entrar {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #fff;
+            background: linear-gradient(135deg,#e94560 0%,#ff6b6b 100%);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all .3s ease;
+            box-shadow: 0 4px 15px rgba(233,69,96,.4);
+        }
+        .btn-entrar:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(233,69,96,.5);
+        }
+        .aviso-entrada {
+            margin-top: 20px;
+            font-size: .85rem;
+            color: #888;
+            line-height: 1.5;
+        }
+        .aviso-entrada strong { color: #ff6b6b; }
+
+        /* Conteúdo Principal */
+        .conteudo {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            display: none;
+            animation: aparecer .6s ease forwards;
+        }
+        @keyframes aparecer {
+            from{opacity:0;transform:translateY(30px);}
+            to{opacity:1;transform:translateY(0);}
+        }
+
+        /* Área da IA */
+        .ia-container {
+            background: rgba(255,255,255,.05);
+            border-radius: 20px;
+            padding: 25px;
+            border: 2px solid rgba(255,215,0,.3);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 30px rgba(255,215,0,.1);
+            margin-bottom: 20px;
+        }
+
+        .ia-cabecalho {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,.1);
+        }
+
+        .ia-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg,#ffd700 0%,#ff8c00 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+
+        .ia-nome h2 {
+            color: #ffd700;
+            font-size: 1.3rem;
+        }
+
+        .ia-nome p {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .progresso {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .passo-indicador {
+            flex: 1;
+            height: 6px;
+            background: #2a2a4a;
+            border-radius: 3px;
+            transition: all .3s ease;
+        }
+
+        .passo-indicador.ativo {
+            background: linear-gradient(90deg,#ffd700,#ff8c00);
+            box-shadow: 0 0 10px rgba(255,215,0,.4);
+        }
+
+        .caixa-mensagem {
+            background: rgba(255,215,0,.08);
+            border-left: 3px solid #ffd700;
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            color: #fff;
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        .opcoes {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .opcao-btn {
+            background: #2a2a4a;
+            border: 2px solid rgba(255,255,255,.1);
+            border-radius: 12px;
+            padding: 15px 20px;
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all .3s ease;
+            text-align: left;
+        }
+
+        .opcao-btn:hover {
+            border-color: #ffd700;
+            background: rgba(255,215,0,.1);
+            transform: translateX(8px);
+        }
+
+        .campo-resposta {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            border: 2px solid rgba(255,255,255,.15);
+            background: #2a2a4a;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            margin-bottom: 15px;
+        }
+
+        .campo-resposta:focus {
+            border-color: #ffd700;
+        }
+
+        .btn-proximo {
+            padding: 12px 30px;
+            background: linear-gradient(135deg,#4cd137 0%,#2ecc71 100%);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all .3s ease;
+        }
+
+        .btn-proximo:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(76,209,55,.3);
+        }
+
+        /* Resultado */
+        .resultado {
+            background: rgba(76,209,55,.08);
+            border: 2px solid #4cd137;
+            border-radius: 16px;
+            padding: 25px;
+            display: none;
+            animation: aparecer .5s ease forwards;
+        }
+
+        .resultado.visivel { display: block; }
+        .resultado h3 {
+            color: #4cd137;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+        }
+
+        .resumo-respostas {
+            background: rgba(255,255,255,.03);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .sensi-grid {
+            display: grid;
+            gap: 10px;
+        }
+
+        .sensi-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 14px 18px;
+            background: rgba(255,255,255,.03);
+            border-radius: 10px;
+            border-bottom: 1px solid rgba(255,255,255,.08);
+        }
+
+        .sensi-nome { color: #ddd; }
+        .sensi-valor {
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 1.15rem;
+        }
+
+        .dpi-recomendado {
+            text-align: center;
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(255,215,0,.1);
+            border-radius: 8px;
+            color: #ffd700;
+        }
+
+        .reiniciar-btn {
+            margin-top: 20px;
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg,#e94560 0%,#ff6b6b 100%);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .aviso {
+            background: rgba(233,69,96,.15);
+            border-left: 4px solid #e94560;
+            padding: 18px;
+            border-radius: 8px;
+            margin-top: 20px;
+            color: #ddd;
+        }
+        .aviso strong { color: #ff6b6b; }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            opacity: .6;
+            font-size: .9rem;
+            color: #aaa;
+        }
+
+        @media(max-width:600px){
+            .caixa-entrada h1 { font-size: 1.5rem; }
+            .ia-cabecalho { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Tela de Entrada -->
+    <div class="tela-entrada" id="telaEntrada">
+        <div class="logo-icone">🤖</div>
+        <div class="caixa-entrada">
+            <h1>Real <span>Sensi FF</span></h1>
+            <p>Conheça a <strong>Mihh</strong>, sua IA de Sensibilidade</p>
+            <button class="btn-entrar" onclick="entrar()">INICIAR COM A IA</button>
+            <div class="aviso-entrada">
+                🔒 Converse com a IA • Ela gera sua sensi personalizada
+            </div>
+        </div>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <div class="conteudo" id="conteudo">
+        <div class="ia-container">
+            <div class="ia-cabecalho">
+                <div class="ia-avatar">🤖</div>
+                <div class="ia-nome">
+                    <h2>Mihh — IA de Sensibilidade</h2>
+                    <p>Analisando seu perfil...</p>
+                </div>
+            </div>
+
+            <!-- Barra de Progresso -->
+            <div class="progresso">
+                <div class="passo-indicador ativo" id="passo1"></div>
+                <div class="passo-indicador" id="passo2"></div>
+                <div class="passo-indicador" id="passo3"></div>
+                <div class="passo-indicador" id="passo4"></div>
+                <div class="passo-indicador" id="passo5"></div>
+            </div>
+
+            <!-- Área da Conversa da IA -->
+            <div id="areaConversa">
+                <!-- Mensagem e opções aparecem aqui -->
+            </div>
+
+            <!-- Resultado Final -->
+            <div class="resultado" id="resultado">
+                <h3>✅ Sua Sensibilidade Pronta!</h3>
+                <div class="resumo-respostas" id="resumoResp"></div>
+                <div class="sensi-grid">
+                    <div class="sensi-item">
+                        <span class="sensi-nome">🔫 Geral</span>
+                        <span class="sensi-valor" id="valGeral">--</span>
+                    </div>
+                    <div class="sensi-item">
+                        <span class="sensi-nome">🎯 Mira de Ponto Vermelho</span>
+                        <span class="sensi-valor" id="valPonto">--</span>
+                    </div>
+                    <div class="sensi-item">
+                        <span class="sensi-nome">🔭 Mira 2x</span>
+                        <span class="sensi-valor" id="val2x">--</span>
+                    </div>
+                    <div class="sensi-item">
+                        <span class="sensi-nome">🔭 Mira 4x</span>
+                        <span class="sensi-valor" id="val4x">--</span>
+                    </div>
+                    <div class="sensi-item">
+                        <span class="sensi-nome">🎯 Mira Sniper (AWM)</span>
+                        <span class="sensi-valor" id="valSniper">--</span>
+                    </div>
+                    <div class="sensi-item">
+                        <span class="sensi-nome">👀 Câmera 360°</span>
+                        <span class="sensi-valor" id="valCamera">--</span>
+                    </div>
+                    <div class="sensi-item">
+                        <span class="sensi-nome">🔘 Tamanho do Botão de Atirar</span>
+                        <span class="sensi-valor" id="valBotao">--</span>
+                    </div>
+                </div>
+                <div class="dpi-recomendado">
+                    📱 DPI Recomendado: <strong id="valDpi">--</strong>
+                </div>
+                <button class="reiniciar-btn" onclick="reiniciar()">🔄 Gerar Outra Sensi</button>
+            </div>
+        </div>
+
+        <div class="aviso">
+            <strong>ℹ️ Como usar:</strong> Anote todos os valores → abra o Free Fire → Configurações → Controles → Sensibilidade → digite manualmente. Ajuste de 2 em 2 pontos até ficar perfeito!
+        </div>
+
+        <footer>
+            🤖 Real Sensi FF — IA Mihh • 2026
+        </footer>
+    </div>
+
+    <script>
+        // Armazena as respostas do usuário
+        let respostas = {
+            modo: '',
+            celular: '',
+            tela: '',
+            estilo: '',
+            dpi: ''
+        };
+        let passoAtual = 1;
+        const totalPassos = 5;
+
+        // Perguntas da IA
+        const perguntas = [
+            {
+                id: 'modo',
+                mensagem: 'Oi! Sou a Mihh, sua IA de sensibilidades! 😊\nQual é o seu modo de jogo principal?',
+                opcoes: [
+                    {texto: '⚔️ 1v1 / X1', valor: '1v1'},
+                    {texto: '🏆 Ranqueada', valor: 'ranked'},
+                    {texto: '👥 CS 4v4 / Squad', valor: 'cs4v4'}
+                ]
+            },
+            {
+                id: 'celular',
+                mensagem: 'Boa! Agora me diz sobre seu aparelho:',
+                opcoes: [
+                    {texto: '📱 Celular Básico', valor: 'basico'},
+                    {texto: '📲 Celular Intermediário', valor: 'medio'},
+                    {texto: '📱 Celular Top / Gama Alta', valor: 'top'}
+                ]
+            },
+            {
+                id: 'tela',
+                mensagem: 'Entendi! E o tamanho da tela?',
+                opcoes: [
+                    {texto: '📱 Pequena (até 6")', valor: 'pequena'},
+                    {texto: '📲 Média (6" a 6.7")', valor: 'media'},
+                    {texto: '📱 Grande (acima de 6.7")', valor: 'grande'}
+                ]
+            },
+            {
+                id: 'estilo',
+                mensagem: 'Perfeito! Agora seu estilo de jogo:',
+                opcoes: [
+                    {texto: '🏃 Rusher — Agressivo, movimento rápido', valor: 'rusher'},
+                    {texto: '⚖️ Equilibrado — Pra tudo', valor: 'equilibrado'},
+                    {texto: '🎯 Preciso — Mira firme, longe', valor: 'preciso'}
+                ]
+            },
+            {
+                id: 'dpi',
+                mensagem: 'Última! Qual o DPI do seu celular?\n(Se não souber, deixe em branco que eu calculo pra você)',
+                tipo: 'dpi'
+            }
+        ];
+
+        function entrar() {
+            document.getElementById('telaEntrada').classList.add('fechar');
+            setTimeout(() => {
+                document.getElementById('conteudo').style.display = 'block';
+                window.scrollTo(0,0);
+                mostrarPergunta(1);
+            }, 400);
+        }
+
+        function mostrarPergunta(num) {
+            passoAtual = num;
+            atualizarProgresso(num);
+            const pergunta = perguntas[num - 1];
+            const area = document.getElementById('areaConversa');
+
+            let html = `<div class="caixa-mensagem">${pergunta.mensagem.replace(/\n/g,'<br>')}</div>`;
+
+            if (pergunta.opcoes) {
+                html += '<div class="opcoes">';
+                pergunta.opcoes.forEach(op => {
+                    html += `<button class="opcao-btn" onclick="responder('${pergunta.id}', '${op.valor}')">${op.texto}</button>`;
+                });
+                html += '</div>';
+            } else if (pergunta.tipo === 'dpi') {
+                html += `
+                    <input type="number" class="campo-resposta" id="respostaDpi" placeholder="Ex: 480, 550, 600">
+                    <button class="btn-proximo" onclick="responderDpi()">Confirmar e Gerar Sensi ✨</button>
+                `;
+            }
+
+            area.innerHTML = html;
+        }
+
+        function atualizarProgresso(passo) {
+            for(let i=1; i<=totalPassos; i++) {
+                const el = document.getElementById('passo'+i);
+                el.classList.toggle('ativo', i <= passo);
+            }
+        }
+
+        function responder(id, valor) {
+            respostas[id] = valor;
+            if (passoAtual < totalPassos) {
+                mostrarPergunta(passoAtual + 1);
+            } else {
+                gerarSensi();
+            }
+        }
+
+        function responderDpi() {
+            const dpi = document.getElementById('respostaDpi').value;
+            respostas.dpi = dpi ? parseInt(dpi) : null;
+            gerarSensi();
+        }
+
+        function gerarSensi() {
+            // Algoritmo da IA — baseado em dispositivo, tela, estilo e DPI
+            // Faixas: Baixa 100-150 | Média 120-175 | Alta 150-200
+
+            // Determina a faixa base
+            let faixaMin, faixaMax;
+            switch(respostas.celular) {
+                case 'basico': faixaMin = 150; faixaMax = 200; break;
+                case 'medio': faixaMin = 120; faixaMax = 175; break;
+                case 'top': faixaMin = 100; faixaMax = 150; break;
+            }
+
+            // Ajusta por tamanho de tela
+            let ajusteTela = 0;
+            if (respostas.tela === 'pequena') ajusteTela = +10;
+            if (respostas.tela === 'grande') ajusteTela = -10;
+
+            // Ajusta por estilo de jogo
+            let ajusteEstilo = 0;
+            if (respostas.estilo === 'rusher') ajusteEstilo = +15;
+            if (respostas.estilo === 'preciso') ajusteEstilo = -10;
+
+            // DPI — se não informado, calcula
+            let dpi = respostas.dpi;
+            if (!dpi) {
+                if (respostas.celular === 'basico') dpi = 411;
+                else if (respostas.celular === 'medio') dpi = 480;
+                else dpi = 592;
+            }
+            const dpiRef = 480;
+            const fatorDpi = dpiRef / dpi;
+
+            // Função de conversão: faixa 100-200 → escala FF 0-100
+            function conv(valor) {
+                return Math.max(10, Math.min(100, Math.round(((valor - 100) / 100) * 100)));
+            }
+
+            // Calcula valores na faixa
+            function calc(base) {
+                let v = base + ajusteTela + ajusteEstilo;
+                v = v * fatorDpi;
+                return Math.max(faixaMin, Math.min(faixaMax, v));
+            }
+
+            // Valores base
+            const geralF = calc((faixaMin + faixaMax) / 2);
+            const pontoF = calc((faixaMin + faixaMax) / 2 - 5);
+            const x2F = calc((faixaMin + faixaMax) / 2 - 10);
+            const x4F = calc((faixaMin + faixaMax) / 2 - 15);
+            const sniperF = calc((faixaMin + faixaMax) / 2 - 40);
+            const cameraF = calc((faixaMin + faixaMax) / 2 + 10);
+
+            // Botão de atirar recomendado
+            let botao;
+            if (respostas.estilo === 'rusher') botao = '48% - 52%';
+            else if (respostas.estilo === 'preciso') botao = '52% - 58%';
+            else botao = '50% - 55%';
+
+            // Mostra resumo
+            document.getElementById('resumoResp').innerHTML = `
+                📋 Perfil analisado pela Mihh:<br>
+                Modo: ${respostas.modo} | Aparelho: ${respostas.celular} | Tela: ${respostas.tela}<br>
+                Estilo: ${respostas.estilo} | DPI usado: ${dpi}
+            `;
+
+            // Mostra valores convertidos pro FF
+            document.getElementById('valGeral').textContent = conv(geralF);
+            document.getElementById('valPonto').textContent = conv(pontoF);
+            document.getElementById('val2x').textContent = conv(x2F);
+            document.getElementById('val4x').textContent = conv(x4F);
+            document.getElementById('valSniper').textContent = conv(sniperF);
+            document.getElementById('valCamera').textContent = conv(cameraF);
+            document.getElementById('valBotao').textContent = botao;
+            document.getElementById('valDpi').textContent = dpi;
+
+            // Esconde conversa, mostra resultado
+            document.getElementById('areaConversa').style.display = 'none';
+            document.getElementById('resultado').classList.add('visivel');
+        }
+
+        function reiniciar() {
+            respostas = { modo:'', celular:'', tela:'', estilo:'', dpi:'' };
+            passoAtual = 1;
+            document.getElementById('resultado').classList.remove('visivel');
+            document.getElementById('areaConversa').style.display = 'block';
+            mostrarPergunta(1);
+        }
+    </script>
+</body>
+</html>
+
